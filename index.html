@@ -2,38 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Runner HIIT</title>
     <style>
         :root { --primary: #2ecc71; --bg: #f4f7f6; --text: #2c3e50; --muted: #95a5a6; --accent: #e67e22; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 400px; width: 100%; }
         
-        .day-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .nav-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--primary); padding: 5px 15px; }
+        /* Layout Fix for Mobile Safari */
+        html, body { 
+            height: 100svh; 
+            margin: 0; 
+            overflow: hidden; 
+            background: var(--bg);
+            font-family: -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { 
+            width: 100%; 
+            max-width: 400px; 
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            box-sizing: border-box;
+        }
         
-        .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box; text-align: center; }
+        .day-nav { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; }
+        .nav-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--primary); padding: 5px 15px; }
         
-        .focus-box { font-style: italic; color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.4; border-left: 3px solid var(--accent); padding-left: 10px; text-align: left; }
+        .card { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 12px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: center;
+            overflow: hidden;
+        }
         
-        .exercise-list { list-style: none; padding: 0; margin: 20px 0; display: flex; flex-direction: column; align-items: center; }
-        .exercise-item { width: 100%; padding: 12px 15px; margin: 8px 0; border-radius: 10px; background: #f8f9fa; color: var(--muted); font-weight: 600; box-sizing: border-box; transition: 0.3s; }
-        .exercise-item.active { background: #eafff0; color: var(--primary); transform: scale(1.05); border: 1px solid var(--primary); }
+        .focus-box { font-style: italic; color: #7f8c8d; font-size: 0.8rem; margin-bottom: 5px; line-height: 1.2; border-left: 3px solid var(--accent); padding-left: 10px; text-align: left; }
         
-        #timer-container { display: none; margin-bottom: 20px; }
-        #timer-display { font-size: 5.5rem; font-weight: 800; margin: -10px 0; }
+        .exercise-list { list-style: none; padding: 0; margin: 5px 0; display: flex; flex-direction: column; gap: 4px; flex: 1; justify-content: center; }
+        .exercise-item { width: 100%; padding: 8px; border-radius: 8px; background: #f8f9fa; color: var(--muted); font-weight: 600; box-sizing: border-box; font-size: 0.85rem; }
+        .exercise-item.active { background: #eafff0; color: var(--primary); border: 1px solid var(--primary); transform: scale(1.02); }
         
-        .btn-group { display: flex; gap: 10px; justify-content: center; width: 100%; }
-        button { flex: 1; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        #timer-container { display: none; margin-bottom: 0; }
+        #timer-display { font-size: 4.5rem; font-weight: 800; line-height: 1; margin: 0; }
+        #status-label { font-weight: bold; color: var(--accent); font-size: 0.9rem; text-transform: uppercase; }
         
-        .workout-footer { display: none; justify-content: space-between; align-items: center; margin-top: 20px; width: 100%; }
-        .set-indicator { font-weight: bold; color: var(--muted); font-size: 1.1rem; }
-        button.stop { background: #e74c3c; padding: 12px 25px; flex: none; width: auto; }
+        .btn-group { display: flex; gap: 10px; width: 100%; }
+        button { flex: 1; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
         
-        .hidden { display: none; }
-        .setup-row { margin-bottom: 15px; text-align: center; }
-        .setup-row label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; color: var(--muted); text-transform: uppercase; }
-        select, input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; font-size: 1rem; text-align: center; }
+        /* Workout Footer */
+        .workout-footer { display: none; justify-content: space-between; align-items: center; gap: 10px; width: 100%; }
+        .set-indicator { font-weight: bold; color: var(--muted); font-size: 0.9rem; text-align: left; min-width: 60px; }
+        .footer-btn { padding: 12px; font-size: 0.9rem; }
+        .pause-btn { background: #3498db; flex: 2; }
+        .stop-btn { background: #e74c3c; flex: 1; }
+        
+        .hidden { display: none !important; }
+        
+        /* Editor Scrollable */
+        #editor-view { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .setup-row { margin-bottom: 10px; text-align: center; }
+        label { display: block; font-size: 0.7rem; font-weight: bold; margin-bottom: 2px; color: var(--muted); text-transform: uppercase; }
+        select, input, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem; text-align: center; background: white; color: var(--text); }
         .custom-input { margin-top: 5px; border-color: var(--accent); display: none; }
     </style>
 </head>
@@ -41,16 +79,16 @@
 
     <div class="container" id="main-view">
         <div class="day-nav">
-            <button class="nav-btn" onclick="changeDay(-1)">❮</button>
-            <h1 id="day-name" style="margin:0; font-size: 1.4rem;">Monday</h1>
-            <button class="nav-btn" onclick="changeDay(1)">❯</button>
+            <button class="nav-btn" onclick="changeDay(-1)">â®</button>
+            <h1 id="day-name" style="margin:0; font-size: 1.2rem;">Monday</h1>
+            <button class="nav-btn" onclick="changeDay(1)">â¯</button>
         </div>
 
         <div class="card">
             <div id="focus-display" class="focus-box">Focus: Loading...</div>
 
             <div id="timer-container">
-                <div id="status-label" style="font-weight:bold; color:var(--accent)">GET READY</div>
+                <div id="status-label">GET READY</div>
                 <div id="timer-display">10</div>
             </div>
 
@@ -63,16 +101,17 @@
 
             <div class="workout-footer" id="workout-footer">
                 <div class="set-indicator" id="set-display">SET 1/3</div>
-                <button class="stop" onclick="quitWorkout()">STOP</button>
+                <button id="btn-pause" class="footer-btn pause-btn" onclick="togglePause()">PAUSE</button>
+                <button class="footer-btn stop-btn" onclick="quitWorkout()">STOP</button>
             </div>
         </div>
     </div>
 
-    <!-- Editor -->
+    <!-- Editor (Hidden by default) -->
     <div class="container hidden" id="editor-view">
-        <div class="card">
-            <button style="background:#3498db; margin-bottom:20px; width:100%" onclick="hideEditor()">← Back to Routine</button>
-            <h3 id="edit-header" style="margin-top:0">Tailor Monday</h3>
+        <div class="card" style="display:block;">
+            <button style="background:#3498db; margin-bottom:15px; width:100%" onclick="hideEditor()">â† Back</button>
+            <h3 id="edit-header" style="margin:0 0 10px 0; font-size: 1.1rem;">Tailor Routine</h3>
             
             <div class="setup-row">
                 <label>Daily Focus</label>
@@ -80,20 +119,19 @@
             </div>
 
             <div class="setup-row" style="display:flex; gap:10px;">
-                <div style="flex:1">
-                    <label>Work (sec)</label>
-                    <input type="number" id="edit-work" step="5" min="20" max="45">
-                </div>
-                <div style="flex:1">
-                    <label>Rest (sec)</label>
-                    <input type="number" id="edit-rest" step="5" min="5" max="20">
-                </div>
+                <div style="flex:1"><label>Work (s)</label><input type="number" id="edit-work"></div>
+                <div style="flex:1"><label>Rest (s)</label><input type="number" id="edit-rest"></div>
             </div>
 
             <div id="exercise-inputs"></div>
-            <button onclick="saveRoutine()" style="width:100%; margin-top:10px;">SAVE CHANGES</button>
+            <button onclick="saveRoutine()" style="width:100%; margin-top:10px; margin-bottom: 20px;">SAVE CHANGES</button>
         </div>
     </div>
+
+    <!-- iPhone Silent Switch Fix -->
+    <audio id="silent-audio" loop preload="auto">
+        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
 
     <script>
         let EXERCISE_POOL = JSON.parse(localStorage.getItem('runnerPool')) || {
@@ -104,10 +142,7 @@
             "Custom": []
         };
 
-        const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        let viewDay = new Date().getDay();
-
-        let workoutData = JSON.parse(localStorage.getItem('runnerWorkouts_v4')) || {
+        let workoutData = JSON.parse(localStorage.getItem('runnerWorkouts_v6')) || {
             1: { focus: "Strength, power and Achilles resilience.", work: 30, rest: 10, ex: ["Squats", "Reverse Lunges", "Single-leg Romanian Deadlift", "Sprinter Bridges", "Single-leg Calf Raises"] },
             2: { focus: "Arm drive, posture and upper-body endurance.", work: 30, rest: 10, ex: ["Press-ups", "Diamond Press-ups", "Triceps Dips", "High Plank Shoulder Taps", "Arm Circles"] },
             3: { focus: "Core stability for maintaining form.", work: 30, rest: 10, ex: ["Front Plank", "Side Plank", "Side Plank", "Dead Bug", "Bird Dog"] },
@@ -117,7 +152,12 @@
             0: { focus: "Rest and recover.", work: 0, rest: 0, ex: [] }
         };
 
+        const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        let viewDay = new Date().getDay();
+        let timerInterval, isPaused = false, timeline = [], stepIdx = 0, secondsLeft = 0;
+
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
         function beep(freq, duration, vol) {
             const osc = audioCtx.createOscillator();
             const g = audioCtx.createGain();
@@ -133,7 +173,6 @@
             document.getElementById('day-name').innerText = DAYS[viewDay];
             document.getElementById('focus-display').innerText = "Focus: " + data.focus;
             const list = document.getElementById('exercise-display-list');
-            
             if(viewDay === 0) {
                 list.innerHTML = "<li class='exercise-item active'>Enjoy your rest day!</li>";
                 document.getElementById('ctrl-btns').style.display = 'none';
@@ -149,16 +188,12 @@
             document.getElementById('main-view').classList.add('hidden');
             document.getElementById('editor-view').classList.remove('hidden');
             const data = workoutData[viewDay];
-            document.getElementById('edit-header').innerText = `Tailor ${DAYS[viewDay]}`;
             document.getElementById('edit-focus').value = data.focus;
             document.getElementById('edit-work').value = data.work;
             document.getElementById('edit-rest').value = data.rest;
-            
             let html = "";
             for(let i=0; i<5; i++) {
-                html += `<div class="setup-row">
-                    <label>Exercise ${i+1}</label>
-                    <select id="input-ex-${i}" onchange="checkCustom(this, ${i})">`;
+                html += `<div class="setup-row"><label>Exercise ${i+1}</label><select id="input-ex-${i}" onchange="checkCustom(this, ${i})">`;
                 Object.entries(EXERCISE_POOL).forEach(([cat, list]) => {
                     if(list.length > 0) {
                         html += `<optgroup label="${cat}">`;
@@ -166,15 +201,12 @@
                         html += `</optgroup>`;
                     }
                 });
-                html += `<option value="ADD_NEW">+ ADD NEW...</option></select>
-                <input type="text" id="custom-ex-${i}" class="custom-input" placeholder="Type exercise name..."></div>`;
+                html += `<option value="ADD_NEW">+ ADD NEW...</option></select><input type="text" id="custom-ex-${i}" class="custom-input" placeholder="Name..."></div>`;
             }
             document.getElementById('exercise-inputs').innerHTML = html;
         }
 
-        function checkCustom(sel, idx) {
-            document.getElementById(`custom-ex-${idx}`).style.display = (sel.value === 'ADD_NEW') ? 'block' : 'none';
-        }
+        function checkCustom(sel, idx) { document.getElementById(`custom-ex-${idx}`).style.display = (sel.value === 'ADD_NEW') ? 'block' : 'none'; }
 
         function saveRoutine() {
             const data = workoutData[viewDay];
@@ -185,31 +217,31 @@
                 let val = document.getElementById(`input-ex-${i}`).value;
                 if(val === 'ADD_NEW') {
                     let customVal = document.getElementById(`custom-ex-${i}`).value.trim();
-                    if(customVal) {
-                        EXERCISE_POOL.Custom.push(customVal);
-                        val = customVal;
-                    }
+                    if(customVal) { EXERCISE_POOL.Custom.push(customVal); val = customVal; }
                 }
                 data.ex[i] = val;
             }
-            localStorage.setItem('runnerWorkouts_v4', JSON.stringify(workoutData));
+            localStorage.setItem('runnerWorkouts_v6', JSON.stringify(workoutData));
             localStorage.setItem('runnerPool', JSON.stringify(EXERCISE_POOL));
             hideEditor(); init();
         }
 
-        function hideEditor() {
-            document.getElementById('main-view').classList.remove('hidden');
-            document.getElementById('editor-view').classList.add('hidden');
+        function hideEditor() { 
+            document.getElementById('main-view').classList.remove('hidden'); 
+            document.getElementById('editor-view').classList.add('hidden'); 
         }
 
-        let timerInterval;
         function startWorkout() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            document.getElementById('silent-audio').play().catch(()=>{}); 
+
             const data = workoutData[viewDay];
             document.getElementById('ctrl-btns').style.display = 'none';
             document.getElementById('timer-container').style.display = 'block';
             document.getElementById('workout-footer').style.display = 'flex';
+            document.getElementById('focus-display').classList.add('hidden');
 
-            let timeline = [{ type: 'GET READY', time: 10, hIdx: 0, round: 1 }];
+            timeline = [{ type: 'GET READY', time: 10, hIdx: 0, round: 1 }];
             for(let r=1; r<=3; r++) {
                 data.ex.forEach((name, i) => {
                     timeline.push({ type: 'WORK', time: data.work, hIdx: i, round: r });
@@ -217,50 +249,58 @@
                 });
             }
 
-            let stepIdx = 0;
-            let secondsLeft = timeline[0].time;
+            stepIdx = 0;
+            secondsLeft = timeline[0].time;
+            isPaused = false;
+            runTimer();
+        }
 
-            const update = () => {
-                const step = timeline[stepIdx];
-                document.getElementById('status-label').innerText = step.type;
-                document.getElementById('status-label').style.color = step.type==='WORK'?'var(--primary)':'var(--accent)';
-                document.getElementById('timer-display').innerText = secondsLeft;
-                document.getElementById('set-display').innerText = `SET ${step.round}/3`;
-                document.querySelectorAll('.exercise-item').forEach((el, idx) => el.classList.toggle('active', idx === step.hIdx));
-            };
+        function togglePause() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isPaused = !isPaused;
+            document.getElementById('btn-pause').innerText = isPaused ? "RESUME" : "PAUSE";
+        }
 
-            update();
+        function runTimer() {
+            updateUI();
             timerInterval = setInterval(() => {
+                if (isPaused) return;
+
                 secondsLeft--;
-                
-                // Audio: Three 600Hz pulses at 3,2,1
-                if (secondsLeft <= 3 && secondsLeft > 0) {
-                    beep(600, 0.15, 0.5);
-                } 
-                // Transition: Long 1200Hz tone at 0
-                else if (secondsLeft === 0) {
-                    beep(1200, 0.6, 0.7);
-                }
+                if (secondsLeft <= 3 && secondsLeft > 0) beep(600, 0.15, 0.5);
+                if (secondsLeft === 0) beep(1200, 0.6, 0.7);
 
                 if (secondsLeft < 0) {
                     stepIdx++;
                     if (stepIdx >= timeline.length) { 
                         clearInterval(timerInterval); 
-                        alert("Workout Complete!"); 
+                        alert("Done!"); 
                         quitWorkout(); 
                         return; 
                     }
                     secondsLeft = timeline[stepIdx].time;
                 }
-                update();
+                updateUI();
             }, 1000);
+        }
+
+        function updateUI() {
+            const step = timeline[stepIdx];
+            document.getElementById('status-label').innerText = step.type;
+            document.getElementById('status-label').style.color = step.type==='WORK'?'var(--primary)':'var(--accent)';
+            document.getElementById('timer-display').innerText = secondsLeft;
+            document.getElementById('set-display').innerText = `SET ${step.round}/3`;
+            document.querySelectorAll('.exercise-item').forEach((el, idx) => el.classList.toggle('active', idx === step.hIdx));
         }
 
         function quitWorkout() {
             clearInterval(timerInterval);
+            document.getElementById('silent-audio').pause();
             document.getElementById('timer-container').style.display = 'none';
             document.getElementById('workout-footer').style.display = 'none';
             document.getElementById('ctrl-btns').style.display = 'flex';
+            document.getElementById('focus-display').classList.remove('hidden');
+            document.getElementById('btn-pause').innerText = "PAUSE";
             init();
         }
 
