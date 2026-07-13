@@ -7,13 +7,12 @@
     <style>
         :root { --primary: #2ecc71; --bg: #f4f7f6; --text: #2c3e50; --muted: #95a5a6; --accent: #e67e22; }
         
-        /* Layout Fix for Mobile Safari */
-        html, body { 
-            height: 100svh; 
-            margin: 0; 
-            overflow: hidden; 
+        body { 
             background: var(--bg);
+            color: var(--text);
             font-family: -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -22,56 +21,49 @@
         .container { 
             width: 100%; 
             max-width: 400px; 
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
             box-sizing: border-box;
         }
         
-        .day-nav { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; }
-        .nav-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--primary); padding: 5px 15px; }
+        /* Fixed Header Arrows */
+        .day-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; width: 100%; }
+        .nav-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--primary); padding: 5px 15px; font-weight: bold; }
         
         .card { 
             background: white; 
             border-radius: 20px; 
-            padding: 12px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+            width: 100%; 
+            box-sizing: border-box; 
             text-align: center;
-            overflow: hidden;
         }
         
-        .focus-box { font-style: italic; color: #7f8c8d; font-size: 0.8rem; margin-bottom: 5px; line-height: 1.2; border-left: 3px solid var(--accent); padding-left: 10px; text-align: left; }
+        .focus-box { font-style: italic; color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.4; border-left: 3px solid var(--accent); padding-left: 10px; text-align: left; }
         
-        .exercise-list { list-style: none; padding: 0; margin: 5px 0; display: flex; flex-direction: column; gap: 4px; flex: 1; justify-content: center; }
-        .exercise-item { width: 100%; padding: 8px; border-radius: 8px; background: #f8f9fa; color: var(--muted); font-weight: 600; box-sizing: border-box; font-size: 0.85rem; }
-        .exercise-item.active { background: #eafff0; color: var(--primary); border: 1px solid var(--primary); transform: scale(1.02); }
+        .exercise-list { list-style: none; padding: 0; margin: 20px 0; display: flex; flex-direction: column; align-items: center; }
+        .exercise-item { width: 100%; padding: 12px 15px; margin: 8px 0; border-radius: 10px; background: #f8f9fa; color: var(--muted); font-weight: 600; box-sizing: border-box; transition: 0.3s; font-size: 1rem; }
+        .exercise-item.active { background: #eafff0; color: var(--primary); transform: scale(1.05); border: 1px solid var(--primary); }
         
-        #timer-container { display: none; margin-bottom: 0; }
-        #timer-display { font-size: 4.5rem; font-weight: 800; line-height: 1; margin: 0; }
-        #status-label { font-weight: bold; color: var(--accent); font-size: 0.9rem; text-transform: uppercase; }
+        #timer-container { display: none; margin-bottom: 20px; }
+        #timer-display { font-size: 5.5rem; font-weight: 800; margin: -10px 0; line-height: 1; }
+        #status-label { font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
         
         .btn-group { display: flex; gap: 10px; width: 100%; }
-        button { flex: 1; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        button { flex: 1; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
         
-        /* Workout Footer */
-        .workout-footer { display: none; justify-content: space-between; align-items: center; gap: 10px; width: 100%; }
-        .set-indicator { font-weight: bold; color: var(--muted); font-size: 0.9rem; text-align: left; min-width: 60px; }
-        .footer-btn { padding: 12px; font-size: 0.9rem; }
-        .pause-btn { background: #3498db; flex: 2; }
+        .workout-footer { display: none; justify-content: space-between; align-items: center; width: 100%; margin-top: 20px; }
+        .set-indicator { font-weight: bold; color: var(--muted); font-size: 1.1rem; flex: 1; text-align: left; }
+        .pause-btn { background: #3498db; flex: 1.5; margin-right: 10px; }
         .stop-btn { background: #e74c3c; flex: 1; }
         
         .hidden { display: none !important; }
         
-        /* Editor Scrollable */
-        #editor-view { overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .setup-row { margin-bottom: 10px; text-align: center; }
-        label { display: block; font-size: 0.7rem; font-weight: bold; margin-bottom: 2px; color: var(--muted); text-transform: uppercase; }
-        select, input, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem; text-align: center; background: white; color: var(--text); }
+        /* Editor remains scrollable */
+        #editor-view { display: none; }
+        #editor-view.active-view { display: block; }
+        .setup-row { margin-bottom: 15px; text-align: center; }
+        label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; color: var(--muted); text-transform: uppercase; }
+        select, input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; font-size: 1rem; text-align: center; }
         .custom-input { margin-top: 5px; border-color: var(--accent); display: none; }
     </style>
 </head>
@@ -79,9 +71,9 @@
 
     <div class="container" id="main-view">
         <div class="day-nav">
-            <button class="nav-btn" onclick="changeDay(-1)">â®</button>
-            <h1 id="day-name" style="margin:0; font-size: 1.2rem;">Monday</h1>
-            <button class="nav-btn" onclick="changeDay(1)">â¯</button>
+            <button class="nav-btn" onclick="changeDay(-1)">&#10094;</button>
+            <h1 id="day-name" style="margin:0; font-size: 1.4rem;">Monday</h1>
+            <button class="nav-btn" onclick="changeDay(1)">&#10095;</button>
         </div>
 
         <div class="card">
@@ -101,17 +93,17 @@
 
             <div class="workout-footer" id="workout-footer">
                 <div class="set-indicator" id="set-display">SET 1/3</div>
-                <button id="btn-pause" class="footer-btn pause-btn" onclick="togglePause()">PAUSE</button>
-                <button class="footer-btn stop-btn" onclick="quitWorkout()">STOP</button>
+                <button id="btn-pause" class="pause-btn" onclick="togglePause()">PAUSE</button>
+                <button class="stop-btn" onclick="quitWorkout()">STOP</button>
             </div>
         </div>
     </div>
 
-    <!-- Editor (Hidden by default) -->
-    <div class="container hidden" id="editor-view">
-        <div class="card" style="display:block;">
-            <button style="background:#3498db; margin-bottom:15px; width:100%" onclick="hideEditor()">â† Back</button>
-            <h3 id="edit-header" style="margin:0 0 10px 0; font-size: 1.1rem;">Tailor Routine</h3>
+    <!-- Editor -->
+    <div class="container" id="editor-view">
+        <div class="card">
+            <button style="background:#3498db; margin-bottom:20px; width:100%" onclick="hideEditor()">&#10094; Back</button>
+            <h3 id="edit-header" style="margin-top:0">Tailor Routine</h3>
             
             <div class="setup-row">
                 <label>Daily Focus</label>
@@ -128,7 +120,6 @@
         </div>
     </div>
 
-    <!-- iPhone Silent Switch Fix -->
     <audio id="silent-audio" loop preload="auto">
         <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
     </audio>
@@ -142,7 +133,7 @@
             "Custom": []
         };
 
-        let workoutData = JSON.parse(localStorage.getItem('runnerWorkouts_v6')) || {
+        let workoutData = JSON.parse(localStorage.getItem('runnerWorkouts_v7')) || {
             1: { focus: "Strength, power and Achilles resilience.", work: 30, rest: 10, ex: ["Squats", "Reverse Lunges", "Single-leg Romanian Deadlift", "Sprinter Bridges", "Single-leg Calf Raises"] },
             2: { focus: "Arm drive, posture and upper-body endurance.", work: 30, rest: 10, ex: ["Press-ups", "Diamond Press-ups", "Triceps Dips", "High Plank Shoulder Taps", "Arm Circles"] },
             3: { focus: "Core stability for maintaining form.", work: 30, rest: 10, ex: ["Front Plank", "Side Plank", "Side Plank", "Dead Bug", "Bird Dog"] },
@@ -186,7 +177,7 @@
 
         function showEditor() {
             document.getElementById('main-view').classList.add('hidden');
-            document.getElementById('editor-view').classList.remove('hidden');
+            document.getElementById('editor-view').classList.add('active-view');
             const data = workoutData[viewDay];
             document.getElementById('edit-focus').value = data.focus;
             document.getElementById('edit-work').value = data.work;
@@ -221,14 +212,14 @@
                 }
                 data.ex[i] = val;
             }
-            localStorage.setItem('runnerWorkouts_v6', JSON.stringify(workoutData));
+            localStorage.setItem('runnerWorkouts_v7', JSON.stringify(workoutData));
             localStorage.setItem('runnerPool', JSON.stringify(EXERCISE_POOL));
             hideEditor(); init();
         }
 
         function hideEditor() { 
             document.getElementById('main-view').classList.remove('hidden'); 
-            document.getElementById('editor-view').classList.add('hidden'); 
+            document.getElementById('editor-view').classList.remove('active-view'); 
         }
 
         function startWorkout() {
