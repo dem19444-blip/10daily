@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Runner HIIT</title>
+    <style>
+        :root { --primary: #2ecc71; --bg: #f4f7f6; --text: #2c3e50; --muted: #95a5a6; --accent: #e67e22; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 400px; width: 100%; }
+        
+        .day-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .nav-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--primary); padding: 5px 15px; }
+        
+        .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box; text-align: center; }
+        
+        .focus-box { font-style: italic; color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.4; border-left: 3px solid var(--accent); padding-left: 10px; text-align: left; }
+        
+        .exercise-list { list-style: none; padding: 0; margin: 20px 0; display: flex; flex-direction: column; align-items: center; }
+        .exercise-item { width: 100%; padding: 12px 15px; margin: 8px 0; border-radius: 10px; background: #f8f9fa; color: var(--muted); font-weight: 600; box-sizing: border-box; transition: 0.3s; }
+        .exercise-item.active { background: #eafff0; color: var(--primary); transform: scale(1.05); border: 1px solid var(--primary); }
+        
+        #timer-container { display: none; margin-bottom: 20px; }
+        #timer-display { font-size: 5.5rem; font-weight: 800; margin: -10px 0; }
+        
+        .btn-group { display: flex; gap: 10px; justify-content: center; width: 100%; }
+        button { flex: 1; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        
+        .workout-footer { display: none; justify-content: space-between; align-items: center; margin-top: 20px; width: 100%; }
+        .set-indicator { font-weight: bold; color: var(--muted); font-size: 1.1rem; }
+        button.stop { background: #e74c3c; padding: 12px 25px; flex: none; width: auto; }
+        
+        .hidden { display: none; }
+        .setup-row { margin-bottom: 15px; text-align: center; }
+        .setup-row label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; color: var(--muted); text-transform: uppercase; }
+        select, input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; font-size: 1rem; text-align: center; }
+        .custom-input { margin-top: 5px; border-color: var(--accent); display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="main-view">
+        <div class="day-nav">
+            <button class="nav-btn" onclick="changeDay(-1)">❮</button>
+            <h1 id="day-name" style="margin:0; font-size: 1.4rem;">Monday</h1>
+            <button class="nav-btn" onclick="changeDay(1)">❯</button>
+        </div>
+
+        <div class="card">
+            <div id="focus-display" class="focus-box">Focus: Loading...</div>
+
+            <div id="timer-container">
+                <div id="status-label" style="font-weight:bold; color:var(--accent)">GET READY</div>
+                <div id="timer-display">10</div>
+            </div>
+
+            <ul class="exercise-list" id="exercise-display-list"></ul>
+
+            <div class="btn-group" id="ctrl-btns">
+                <button onclick="startWorkout()">START</button>
+                <button style="background:#3498db" onclick="showEditor()">TAILOR</button>
+            </div>
+
+            <div class="workout-footer" id="workout-footer">
+                <div class="set-indicator" id="set-display">SET 1/3</div>
+                <button class="stop" onclick="quitWorkout()">STOP</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editor -->
+    <div class="container hidden" id="editor-view">
+        <div class="card">
+            <button style="background:#3498db; margin-bottom:20px; width:100%" onclick="hideEditor()">← Back to Routine</button>
+            <h3 id="edit-header" style="margin-top:0">Tailor Monday</h3>
+            
+            <div class="setup-row">
+                <label>Daily Focus</label>
+                <textarea id="edit-focus" rows="2"></textarea>
+            </div>
+
+            <div class="setup-row" style="display:flex; gap:10px;">
+                <div style="flex:1">
+                    <label>Work (sec)</label>
+                    <input type="number" id="edit-work" step="5" min="20" max="45">
+                </div>
+                <div style="flex:1">
+                    <label>Rest (sec)</label>
+                    <input type="number" id="edit-rest" step="5" min="5" max="20">
+                </div>
+            </div>
+
+            <div id="exercise-inputs"></div>
+            <button onclick="saveRoutine()" style="width:100%; margin-top:10px;">SAVE CHANGES</button>
+        </div>
+    </div>
+
+    <script>
+        let EXERCISE_POOL = JSON.parse(localStorage.getItem('runnerPool')) || {
+            "Legs": ["Squats", "Reverse Lunges", "Forward Lunges", "Split Squats", "Side Lunges", "Single-leg Romanian Deadlift", "Sprinter Bridges", "Single-leg Calf Raises", "Tibialis Raises"],
+            "Core": ["Front Plank", "Side Plank", "Dead Bug", "Bird Dog", "Plank Shoulder Taps", "Reverse Crunch", "Bicycle Crunch", "Mountain Climbers", "Flutter Kicks", "Heel Taps"],
+            "Upper Body": ["Press-ups", "Diamond Press-ups", "Triceps Dips", "Arm Circles", "High Plank Shoulder Taps"],
+            "Hip Stability & Balance": ["Clamshells", "Fire Hydrants", "Donkey Kicks", "Single-leg Glute Bridges", "Standing Hip Abduction", "Single-leg Balance with Knee Drive"],
+            "Custom": []
+        };
+
+        const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        let viewDay = new Date().getDay();
+
+        let workoutData = JSON.parse(localStorage.getItem('runnerWorkouts_v4')) || {
+            1: { focus: "Strength, power and Achilles resilience.", work: 30, rest: 10, ex: ["Squats", "Reverse Lunges", "Single-leg Romanian Deadlift", "Sprinter Bridges", "Single-leg Calf Raises"] },
+            2: { focus: "Arm drive, posture and upper-body endurance.", work: 30, rest: 10, ex: ["Press-ups", "Diamond Press-ups", "Triceps Dips", "High Plank Shoulder Taps", "Arm Circles"] },
+            3: { focus: "Core stability for maintaining form.", work: 30, rest: 10, ex: ["Front Plank", "Side Plank", "Side Plank", "Dead Bug", "Bird Dog"] },
+            4: { focus: "Balance, coordination and injury prevention.", work: 30, rest: 10, ex: ["Split Squats", "Single-leg Balance with Knee Drive", "Side Lunges", "Plank Shoulder Taps", "Single-leg Glute Bridges"] },
+            5: { focus: "Hip stability and glute activation.", work: 30, rest: 10, ex: ["Clamshells", "Fire Hydrants", "Donkey Kicks", "Standing Hip Abduction", "Single-leg Glute Bridges"] },
+            6: { focus: "Athletic movement and conditioning.", work: 30, rest: 10, ex: ["Mountain Climbers", "Reverse Crunch", "Flutter Kicks", "Bicycle Crunch", "Tibialis Raises"] },
+            0: { focus: "Rest and recover.", work: 0, rest: 0, ex: [] }
+        };
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function beep(freq, duration, vol) {
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            g.gain.setValueAtTime(vol, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function init() {
+            const data = workoutData[viewDay];
+            document.getElementById('day-name').innerText = DAYS[viewDay];
+            document.getElementById('focus-display').innerText = "Focus: " + data.focus;
+            const list = document.getElementById('exercise-display-list');
+            
+            if(viewDay === 0) {
+                list.innerHTML = "<li class='exercise-item active'>Enjoy your rest day!</li>";
+                document.getElementById('ctrl-btns').style.display = 'none';
+            } else {
+                list.innerHTML = data.ex.map((e, i) => `<li class="exercise-item" id="ex-item-${i}">${e}</li>`).join('');
+                document.getElementById('ctrl-btns').style.display = 'flex';
+            }
+        }
+
+        function changeDay(dir) { viewDay = (viewDay + dir + 7) % 7; init(); }
+
+        function showEditor() {
+            document.getElementById('main-view').classList.add('hidden');
+            document.getElementById('editor-view').classList.remove('hidden');
+            const data = workoutData[viewDay];
+            document.getElementById('edit-header').innerText = `Tailor ${DAYS[viewDay]}`;
+            document.getElementById('edit-focus').value = data.focus;
+            document.getElementById('edit-work').value = data.work;
+            document.getElementById('edit-rest').value = data.rest;
+            
+            let html = "";
+            for(let i=0; i<5; i++) {
+                html += `<div class="setup-row">
+                    <label>Exercise ${i+1}</label>
+                    <select id="input-ex-${i}" onchange="checkCustom(this, ${i})">`;
+                Object.entries(EXERCISE_POOL).forEach(([cat, list]) => {
+                    if(list.length > 0) {
+                        html += `<optgroup label="${cat}">`;
+                        list.forEach(ex => html += `<option value="${ex}" ${data.ex[i]===ex?'selected':''}>${ex}</option>`);
+                        html += `</optgroup>`;
+                    }
+                });
+                html += `<option value="ADD_NEW">+ ADD NEW...</option></select>
+                <input type="text" id="custom-ex-${i}" class="custom-input" placeholder="Type exercise name..."></div>`;
+            }
+            document.getElementById('exercise-inputs').innerHTML = html;
+        }
+
+        function checkCustom(sel, idx) {
+            document.getElementById(`custom-ex-${idx}`).style.display = (sel.value === 'ADD_NEW') ? 'block' : 'none';
+        }
+
+        function saveRoutine() {
+            const data = workoutData[viewDay];
+            data.focus = document.getElementById('edit-focus').value;
+            data.work = parseInt(document.getElementById('edit-work').value) || 30;
+            data.rest = parseInt(document.getElementById('edit-rest').value) || 10;
+            for(let i=0; i<5; i++) {
+                let val = document.getElementById(`input-ex-${i}`).value;
+                if(val === 'ADD_NEW') {
+                    let customVal = document.getElementById(`custom-ex-${i}`).value.trim();
+                    if(customVal) {
+                        EXERCISE_POOL.Custom.push(customVal);
+                        val = customVal;
+                    }
+                }
+                data.ex[i] = val;
+            }
+            localStorage.setItem('runnerWorkouts_v4', JSON.stringify(workoutData));
+            localStorage.setItem('runnerPool', JSON.stringify(EXERCISE_POOL));
+            hideEditor(); init();
+        }
+
+        function hideEditor() {
+            document.getElementById('main-view').classList.remove('hidden');
+            document.getElementById('editor-view').classList.add('hidden');
+        }
+
+        let timerInterval;
+        function startWorkout() {
+            const data = workoutData[viewDay];
+            document.getElementById('ctrl-btns').style.display = 'none';
+            document.getElementById('timer-container').style.display = 'block';
+            document.getElementById('workout-footer').style.display = 'flex';
+
+            let timeline = [{ type: 'GET READY', time: 10, hIdx: 0, round: 1 }];
+            for(let r=1; r<=3; r++) {
+                data.ex.forEach((name, i) => {
+                    timeline.push({ type: 'WORK', time: data.work, hIdx: i, round: r });
+                    if(!(r===3 && i===4)) timeline.push({ type: 'REST', time: data.rest, hIdx: (i+1)%5, round: r });
+                });
+            }
+
+            let stepIdx = 0;
+            let secondsLeft = timeline[0].time;
+
+            const update = () => {
+                const step = timeline[stepIdx];
+                document.getElementById('status-label').innerText = step.type;
+                document.getElementById('status-label').style.color = step.type==='WORK'?'var(--primary)':'var(--accent)';
+                document.getElementById('timer-display').innerText = secondsLeft;
+                document.getElementById('set-display').innerText = `SET ${step.round}/3`;
+                document.querySelectorAll('.exercise-item').forEach((el, idx) => el.classList.toggle('active', idx === step.hIdx));
+            };
+
+            update();
+            timerInterval = setInterval(() => {
+                secondsLeft--;
+                
+                // Audio: Three 600Hz pulses at 3,2,1
+                if (secondsLeft <= 3 && secondsLeft > 0) {
+                    beep(600, 0.15, 0.5);
+                } 
+                // Transition: Long 1200Hz tone at 0
+                else if (secondsLeft === 0) {
+                    beep(1200, 0.6, 0.7);
+                }
+
+                if (secondsLeft < 0) {
+                    stepIdx++;
+                    if (stepIdx >= timeline.length) { 
+                        clearInterval(timerInterval); 
+                        alert("Workout Complete!"); 
+                        quitWorkout(); 
+                        return; 
+                    }
+                    secondsLeft = timeline[stepIdx].time;
+                }
+                update();
+            }, 1000);
+        }
+
+        function quitWorkout() {
+            clearInterval(timerInterval);
+            document.getElementById('timer-container').style.display = 'none';
+            document.getElementById('workout-footer').style.display = 'none';
+            document.getElementById('ctrl-btns').style.display = 'flex';
+            init();
+        }
+
+        init();
+    </script>
+</body>
+</html>
