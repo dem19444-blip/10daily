@@ -11,44 +11,16 @@
     <style>
         :root { --primary: #2ecc71; --bg: #f4f7f6; --text: #2c3e50; --muted: #95a5a6; --accent: #e67e22; --info: #2980b9; }
         
-        body { 
-            background: var(--bg);
-            color: var(--text);
-            font-family: -apple-system, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 400px; box-sizing: border-box; }
         
         /* Navigation Area */
         .header-container { text-align: center; margin-bottom: 15px; }
         .day-nav { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .nav-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--primary); padding: 5px 15px; font-weight: bold; }
-        
-        .progress-link {
-            color: var(--info);
-            font-size: 0.85rem;
-            font-weight: bold;
-            text-decoration: underline;
-            cursor: pointer;
-            display: inline-block;
-            margin-top: 5px;
-        }
+        .progress-link { color: var(--info); font-size: 0.85rem; font-weight: bold; text-decoration: underline; cursor: pointer; display: inline-block; margin-top: 5px; }
 
-        .card { 
-            background: white; 
-            border-radius: 20px; 
-            padding: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
-            width: 100%; 
-            box-sizing: border-box; 
-            text-align: center;
-        }
-        
+        .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box; text-align: center; }
         .focus-box { font-style: italic; color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.4; border-left: 3px solid var(--accent); padding-left: 10px; text-align: left; }
         
         .exercise-list { list-style: none; padding: 0; margin: 20px 0; display: flex; flex-direction: column; align-items: center; }
@@ -68,55 +40,31 @@
         .stop-btn { background: #e74c3c; flex: 1; }
         
         /* Weekly Progress Styling */
-        .progress-instruction { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 20px; line-height: 1.4; font-style: italic; }
+        .progress-instruction { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 10px; line-height: 1.4; font-style: italic; }
+        .streak-counter { font-weight: bold; color: var(--text); font-size: 1rem; margin-bottom: 20px; display: block; }
         .progress-list { list-style: none; padding: 0; margin: 15px 0; width: 100%; }
-        .progress-day-row {
-            background: #edf2f7; /* Pastel blue-grey */
-            margin-bottom: 10px;
-            padding: 15px 20px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            color: var(--text);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            cursor: pointer;
-        }
+        .progress-day-row { background: #edf2f7; margin-bottom: 10px; padding: 15px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; cursor: pointer; }
         .progress-day-row.is-done { background: #eafff0; border-left: 5px solid var(--primary); }
         .tick { color: var(--primary); font-size: 1.3rem; font-weight: bold; }
         
         /* Modal Instructions */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: white;
-            width: 90%;
-            max-width: 400px;
-            max-height: 80vh;
-            border-radius: 20px;
-            padding: 25px;
-            overflow-y: auto;
-            position: relative;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; width: 90%; max-width: 400px; max-height: 80vh; border-radius: 20px; padding: 25px; overflow-y: auto; position: relative; }
         
         .hidden { display: none !important; }
         .setup-row { margin-bottom: 15px; text-align: center; }
         label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; color: var(--muted); text-transform: uppercase; }
-        select, input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; font-size: 1rem; text-align: center; }
+        select, input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; font-size: 1rem; text-align: center; -webkit-appearance: none; }
         .custom-input { margin-top: 5px; border-color: var(--accent); display: none; }
     </style>
 </head>
 <body>
 
-    <!-- MAIN WORKOUT VIEW -->
+    <!-- SILENT AUDIO FOR BYPASSING MUTE SWITCH -->
+    <audio id="silent-loop" loop preload="auto">
+        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+
     <div class="container" id="main-view">
         <div class="header-container">
             <div class="day-nav">
@@ -129,19 +77,15 @@
 
         <div class="card">
             <div id="focus-display" class="focus-box">Focus: Loading...</div>
-
             <div id="timer-container">
                 <div id="status-label">GET READY</div>
                 <div id="timer-display">10</div>
             </div>
-
             <ul class="exercise-list" id="exercise-display-list"></ul>
-
             <div class="btn-group" id="ctrl-btns">
                 <button onclick="startWorkout()">START</button>
                 <button style="background:#3498db" onclick="showEditor()">TAILOR</button>
             </div>
-
             <div class="workout-footer" id="workout-footer">
                 <div class="set-indicator" id="set-display">SET 1/3</div>
                 <button id="btn-pause" class="pause-btn" onclick="togglePause()">PAUSE</button>
@@ -150,68 +94,49 @@
         </div>
     </div>
 
-    <!-- WEEKLY PROGRESS VIEW -->
     <div class="container hidden" id="progress-view">
         <h1 style="text-align: center; color: var(--primary); margin-bottom: 5px;">10Daily Weekly Progress</h1>
         <div style="text-align: center;">
-            <p class="progress-instruction">Sessions are automatically ticked off once you reach the 'Done!' screen. Aim for a full streak!</p>
+            <p class="progress-instruction">Sessions are automatically ticked off once you reach the 'Done!' screen.</p>
+            <span class="streak-counter">Total Weeks Completed: <span id="total-weeks-display">0</span></span>
         </div>
-        
-        <div class="progress-list" id="progress-list-content">
-            <!-- Rows injected by JS -->
-        </div>
-
+        <div class="progress-list" id="progress-list-content"></div>
         <div style="text-align: center; margin: 15px 0;">
             <span style="color: var(--info); font-weight: bold; text-decoration: underline; cursor: pointer;" onclick="openInstructions()">App Instructions</span>
         </div>
-        
         <div class="btn-group">
             <button style="background: var(--muted);" onclick="goBackToWorkout()">Back</button>
             <button style="background: var(--accent);" onclick="resetWeek()">Reset Week</button>
         </div>
     </div>
 
-    <!-- TAILOR / EDITOR VIEW -->
     <div class="container hidden" id="editor-view">
         <div class="card">
             <button style="background:#3498db; margin-bottom:20px; width:100%" onclick="hideEditor()">&#10094; Back</button>
             <h3 id="edit-header" style="margin-top:0">Tailor Monday</h3>
-            
-            <div class="setup-row">
-                <label>Daily Focus</label>
-                <textarea id="edit-focus" rows="2"></textarea>
-            </div>
-
-            <div class="setup-row" style="display:flex; gap:10px;">
-                <div style="flex:1"><label>Work (s)</label><input type="number" id="edit-work" step="5"></div>
-                <div style="flex:1"><label>Rest (s)</label><input type="number" id="edit-rest" step="5"></div>
-            </div>
-
+            <div class="setup-row"><label>Daily Focus</label><textarea id="edit-focus" rows="2"></textarea></div>
+            <!-- Stacked Work/Rest for better button clearance -->
+            <div class="setup-row"><label>Work (s)</label><input type="number" id="edit-work" step="5"></div>
+            <div class="setup-row"><label>Rest (s)</label><input type="number" id="edit-rest" step="5"></div>
             <div id="exercise-inputs"></div>
             <button onclick="saveRoutine()" style="width:100%; margin-top:10px; margin-bottom: 20px;">SAVE CHANGES</button>
         </div>
     </div>
 
-    <!-- INSTRUCTIONS MODAL -->
     <div class="modal-overlay" id="modal-overlay" onclick="closeInstructions()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div style="text-align: right;"><button onclick="closeInstructions()" style="background: none; color: var(--muted); padding: 0; font-size: 1.5rem;">&times;</button></div>
+            <div style="text-align: right;"><button onclick="closeInstructions()" style="background: none; color: var(--muted); padding: 0; font-size: 1.5rem; border: none; cursor: pointer;">&times;</button></div>
             <div id="modal-body">
                 <h2 style="color: var(--primary); margin-top: 0;">Welcome to 10Daily</h2>
                 <p><strong>The Philosophy</strong></p>
                 <p>This app is designed for runners to build strength and resilience in just 10 minutes <strong>Daily</strong>. Each session consists of 5 exercises repeated through 3 sets (30s work / 10s rest).</p>
-                
                 <p><strong>How to Use</strong></p>
-                <p><strong>Start:</strong> Hit 'Start' to begin the 10-second 'Get Ready' countdown. There will be 3 second <strong>Beep</strong> countdowns for each change between 'work' and 'rest'. The highlighted exercise is the current or upcoming exercise.</p>
-                <p><strong>Tailor:</strong> Want to change an exercise? Tap 'Tailor' to swap any movement from our runner-specific exercise pool or add your own 'Custom' exercise. You can tailor the length of work and rest also, although bear in mind that 30s work / 10s rest is perfect for keeping your workout to 10 minutes exactly. You can also change the 'focus' of each day, however, the app is pre-populated with the perfect balance for building runner strength and resilience.</p>
-                <p><strong>Progression:</strong> Your progress is tracked on the Weekly Progress page, click below the day of the week to access this. Aim to get 6 ticks by <strong>Sunday</strong>! Use the 'Reset Week' button on Sunday to start fresh, or use Sunday as a catch-up day to complete your week.</p>
-                
+                <p><strong>Start:</strong> Hit 'Start' for 10-second 'Get Ready'. There will be 3 second <strong>Beep</strong> countdowns for changes. Highlighting indicates the current/upcoming move.</p>
+                <p><strong>Tailor:</strong> Tap 'Tailor' to swap exercises or change work/rest lengths (5s increments). You can also change the daily 'focus'. Your tailored changes will be preserved unless you clear your cache.</p>
+                <p><strong>Progression:</strong> Tracked on Weekly Progress. Aim for 6 ticks by <strong>Sunday</strong>! Use 'Reset Week' to start fresh.</p>
                 <p><strong>iPhone & Audio Tips</strong></p>
-                <p><strong>Music:</strong> You can run Spotify or Apple Music in the background. 10Daily beeps will play over your music without pausing it.</p>
-                <p><strong>Installation:</strong> For the best experience, tap the 'Share' icon in Safari and select 'Add to Home Screen' to use 10Daily as a full-screen app.</p>
-                
-                <p><strong>The Exercises</strong></p>
-                <p>Our routines focus on Single-leg Strength (running power), Core Stability (form maintenance), and Hip/Glute activation (injury prevention).</p>
+                <p><strong>Music:</strong> Mix with Spotify/Apple Music. Beeps play over music without pausing. App ignores the hardware silent switch while active.</p>
+                <p><strong>Installation:</strong> Share > 'Add to Home Screen' for full-screen mode.</p>
             </div>
             <button onclick="closeInstructions()" style="width: 100%; margin-top: 15px;">Got it</button>
         </div>
@@ -227,8 +152,7 @@
         };
 
         const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        
-        let workoutData = JSON.parse(localStorage.getItem('runnerWorkouts_v10')) || {
+        let workoutData = JSON.parse(localStorage.getItem('runnerWorkouts_v11')) || {
             1: { focus: "Strength, power and Achilles resilience.", work: 30, rest: 10, ex: ["Squats", "Reverse Lunges", "Single-leg Romanian Deadlift", "Sprinter Bridges", "Single-leg Calf Raises"] },
             2: { focus: "Arm drive, posture and upper-body endurance.", work: 30, rest: 10, ex: ["Press-ups", "Diamond Press-ups", "Triceps Dips", "High Plank Shoulder Taps", "Arm Circles"] },
             3: { focus: "Core stability for maintaining form.", work: 30, rest: 10, ex: ["Front Plank", "Side Plank", "Side Plank", "Dead Bug", "Bird Dog"] },
@@ -238,11 +162,11 @@
             0: { focus: "Rest and recover.", work: 0, rest: 0, ex: [] }
         };
 
-        let completedDays = JSON.parse(localStorage.getItem('runnerCompletion_v10')) || [];
+        let completedDays = JSON.parse(localStorage.getItem('runnerCompletion_v11')) || [];
+        let totalWeeks = parseInt(localStorage.getItem('runnerTotalWeeks_v11')) || 0;
         
         let viewDay = new Date().getDay(); 
         let timerInterval, isPaused = false, timeline = [], stepIdx = 0, secondsLeft = 0, wakeLock = null;
-
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
         function beep(freq, duration, vol) {
@@ -256,13 +180,7 @@
             osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible" && audioCtx.state === 'suspended') audioCtx.resume();
-        });
-
-        async function requestWakeLock() {
-            try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
-        }
+        async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
 
         function init() {
             const data = workoutData[viewDay];
@@ -283,35 +201,38 @@
         function showProgress() {
             document.getElementById('main-view').classList.add('hidden');
             document.getElementById('progress-view').classList.remove('hidden');
+            document.getElementById('total-weeks-display').innerText = totalWeeks;
             const list = document.getElementById('progress-list-content');
             list.innerHTML = "";
             for (let i = 1; i <= 6; i++) {
                 const done = completedDays.includes(i);
                 list.innerHTML += `<div class="progress-day-row ${done ? 'is-done' : ''}" onclick="jumpToDay(${i})">
-                    ${DAYS[i]} <span class="tick">${done ? 'âœ“' : ''}</span>
+                    ${DAYS[i]} <span class="tick">${done ? '&#10003;' : ''}</span>
                 </div>`;
+            }
+        }
+
+        function resetWeek() {
+            if (confirm("Reset current week?")) {
+                if (completedDays.length === 6) {
+                    totalWeeks++;
+                    localStorage.setItem('runnerTotalWeeks_v11', totalWeeks);
+                }
+                completedDays = [];
+                localStorage.setItem('runnerCompletion_v11', JSON.stringify(completedDays));
+                showProgress();
             }
         }
 
         function jumpToDay(day) { viewDay = day; goBackToWorkout(); }
         function goBackToWorkout() { document.getElementById('progress-view').classList.add('hidden'); document.getElementById('main-view').classList.remove('hidden'); init(); }
-
         function openInstructions() { document.getElementById('modal-overlay').style.display = 'flex'; }
         function closeInstructions() { document.getElementById('modal-overlay').style.display = 'none'; }
-
-        function resetWeek() {
-            if (confirm("Reset all completed ticks for the week?")) {
-                completedDays = [];
-                localStorage.setItem('runnerCompletion_v10', JSON.stringify(completedDays));
-                showProgress();
-            }
-        }
 
         function showEditor() {
             document.getElementById('main-view').classList.add('hidden');
             document.getElementById('editor-view').classList.remove('hidden');
             const data = workoutData[viewDay];
-            document.getElementById('edit-header').innerText = `Tailor ${DAYS[viewDay]}`;
             document.getElementById('edit-focus').value = data.focus;
             document.getElementById('edit-work').value = data.work;
             document.getElementById('edit-rest').value = data.rest;
@@ -329,7 +250,6 @@
         }
 
         function checkCustom(sel, idx) { document.getElementById(`custom-ex-${idx}`).style.display = (sel.value === 'ADD_NEW') ? 'block' : 'none'; }
-
         function saveRoutine() {
             const data = workoutData[viewDay];
             data.focus = document.getElementById('edit-focus').value;
@@ -343,15 +263,15 @@
                 }
                 data.ex[i] = val;
             }
-            localStorage.setItem('runnerWorkouts_v10', JSON.stringify(workoutData));
+            localStorage.setItem('runnerWorkouts_v11', JSON.stringify(workoutData));
             localStorage.setItem('runnerPool', JSON.stringify(EXERCISE_POOL));
             hideEditor(); init();
         }
-
         function hideEditor() { document.getElementById('main-view').classList.remove('hidden'); document.getElementById('editor-view').classList.add('hidden'); }
 
         function startWorkout() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
+            document.getElementById('silent-loop').play().catch(()=>{}); // iOS mute bypass
             requestWakeLock();
             const data = workoutData[viewDay];
             document.getElementById('ctrl-btns').style.display = 'none';
@@ -359,7 +279,6 @@
             document.getElementById('workout-footer').style.display = 'flex';
             document.getElementById('focus-display').classList.add('hidden');
             document.getElementById('progress-trigger').classList.add('hidden');
-
             timeline = [{ type: 'GET READY', time: 10, hIdx: 0, round: 1 }];
             for(let r=1; r<=3; r++) {
                 data.ex.forEach((name, i) => {
@@ -367,8 +286,7 @@
                     if(!(r===3 && i===4)) timeline.push({ type: 'REST', time: data.rest, hIdx: (i+1)%5, round: r });
                 });
             }
-            stepIdx = 0; secondsLeft = timeline[0].time; isPaused = false;
-            runTimer();
+            stepIdx = 0; secondsLeft = timeline[0].time; isPaused = false; runTimer();
         }
 
         function togglePause() { if (audioCtx.state === 'suspended') audioCtx.resume(); isPaused = !isPaused; document.getElementById('btn-pause').innerText = isPaused ? "RESUME" : "PAUSE"; }
@@ -386,7 +304,7 @@
                         clearInterval(timerInterval); 
                         if (viewDay !== 0 && !completedDays.includes(viewDay)) {
                             completedDays.push(viewDay);
-                            localStorage.setItem('runnerCompletion_v10', JSON.stringify(completedDays));
+                            localStorage.setItem('runnerCompletion_v11', JSON.stringify(completedDays));
                         }
                         alert("Done!"); quitWorkout(); return; 
                     }
@@ -407,6 +325,7 @@
 
         function quitWorkout() {
             clearInterval(timerInterval);
+            document.getElementById('silent-loop').pause();
             if (wakeLock) wakeLock.release().then(() => wakeLock = null);
             document.getElementById('timer-container').style.display = 'none';
             document.getElementById('workout-footer').style.display = 'none';
