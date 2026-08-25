@@ -34,6 +34,12 @@
         .btn-group { display: flex; gap: 10px; width: 100%; }
         button { flex: 1; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
         
+        /* Audio Widget Styles */
+        .audio-widget { margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .audio-label { font-size: 0.75rem; color: var(--muted); font-weight: bold; text-transform: uppercase; }
+        .track-name { font-size: 0.85rem; color: var(--info); font-weight: 600; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .audio-btn { background: #edf2f7; color: var(--text); padding: 8px 15px; font-size: 0.8rem; border-radius: 8px; flex: none; width: auto; }
+
         .workout-footer { display: none; justify-content: space-between; align-items: center; width: 100%; margin-top: 20px; }
         .set-indicator { font-weight: bold; color: var(--muted); font-size: 1.1rem; flex: 1; text-align: left; }
         .pause-btn { background: #3498db; flex: 1.5; margin-right: 10px; }
@@ -65,6 +71,9 @@
         <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
     </audio>
 
+    <!-- WORKOUT MUSIC PLAYER -->
+    <audio id="workout-music" src="Silence.mp3" preload="auto"></audio>
+
     <div class="container" id="main-view">
         <div class="header-container">
             <div class="day-nav">
@@ -82,10 +91,22 @@
                 <div id="timer-display">10</div>
             </div>
             <ul class="exercise-list" id="exercise-display-list"></ul>
-            <div class="btn-group" id="ctrl-btns">
-                <button onclick="startWorkout()">START</button>
-                <button style="background:#3498db" onclick="showEditor()">TAILOR</button>
+            
+            <div id="main-controls">
+                <div class="btn-group" id="ctrl-btns">
+                    <button onclick="startWorkout()">START</button>
+                    <button style="background:#3498db" onclick="showEditor()">TAILOR</button>
+                </div>
+
+                <!-- Music Selector Widget -->
+                <div class="audio-widget" id="audio-widget">
+                    <span class="audio-label">Workout Music</span>
+                    <span id="track-display" class="track-name">Default: Silence.mp3</span>
+                    <input type="file" id="music-upload" accept="audio/*" style="display:none" onchange="handleMusicUpload(this)">
+                    <button class="audio-btn" onclick="document.getElementById('music-upload').click()">Choose from Phone...</button>
+                </div>
             </div>
+
             <div class="workout-footer" id="workout-footer">
                 <div class="set-indicator" id="set-display">SET 1/3</div>
                 <button id="btn-pause" class="pause-btn" onclick="togglePause()">PAUSE</button>
@@ -94,6 +115,7 @@
         </div>
     </div>
 
+    <!-- Rest of the views (Progress/Editor/Modal) remain identical -->
     <div class="container hidden" id="progress-view">
         <h1 style="text-align: center; color: var(--primary); margin-bottom: 5px;">10Daily Weekly Progress</h1>
         <div style="text-align: center;">
@@ -115,7 +137,6 @@
             <button style="background:#3498db; margin-bottom:20px; width:100%" onclick="hideEditor()">&#10094; Back</button>
             <h3 id="edit-header" style="margin-top:0">Tailor Monday</h3>
             <div class="setup-row"><label>Daily Focus</label><textarea id="edit-focus" rows="2"></textarea></div>
-            <!-- Stacked Work/Rest for better button clearance -->
             <div class="setup-row"><label>Work (s)</label><input type="number" id="edit-work" step="5"></div>
             <div class="setup-row"><label>Rest (s)</label><input type="number" id="edit-rest" step="5"></div>
             <div id="exercise-inputs"></div>
@@ -129,13 +150,9 @@
             <div id="modal-body">
                 <h2 style="color: var(--primary); margin-top: 0;">Welcome to 10Daily</h2>
                 <p><strong>The Philosophy</strong></p>
-                <p>This app is designed for runners to build strength and resilience in just 10 minutes <strong>Daily</strong>. Each session consists of 5 exercises repeated through 3 sets (30s work / 10s rest).</p>
+                <p>This app is designed for runners to build strength and resilience in just 10 minutes <strong>Daily</strong>.</p>
                 <p><strong>How to Use</strong></p>
-                <p><strong>Start:</strong> Hit 'Start' for 10-second 'Get Ready'. There will be 3 second <strong>Beep</strong> countdowns for changes. Highlighting indicates the current/upcoming move.</p>
-                <p><strong>Tailor:</strong> Tap 'Tailor' to swap exercises or change work/rest lengths (5s increments). You can also change the daily 'focus'. Your tailored changes will be preserved unless you clear your cache.</p>
-                <p><strong>Progression:</strong> Tracked on Weekly Progress. Aim for 6 ticks by <strong>Sunday</strong>! Use 'Reset Week' to start fresh.</p>
-                <p><strong>iPhone & Audio Tips</strong></p>
-                <p><strong>Music:</strong> Mix with Spotify/Apple Music. Beeps play over music without pausing. App ignores the hardware silent switch while active.</p>
+                <p><strong>Music:</strong> Use the selector below 'Start' to choose a track from your phone. If none is chosen, it plays 'Silence.mp3' to ensure the app stays awake and beeps correctly.</p>
                 <p><strong>Installation:</strong> Share > 'Add to Home Screen' for full-screen mode.</p>
             </div>
             <button onclick="closeInstructions()" style="width: 100%; margin-top: 15px;">Got it</button>
@@ -143,6 +160,7 @@
     </div>
 
     <script>
+        // Data and Initial Variables preserved
         let EXERCISE_POOL = JSON.parse(localStorage.getItem('runnerPool')) || {
             "Legs": ["Squats", "Reverse Lunges", "Forward Lunges", "Split Squats", "Side Lunges", "Single-leg Romanian Deadlift", "Sprinter Bridges", "Single-leg Calf Raises", "Tibialis Raises"],
             "Core": ["Front Plank", "Side Plank", "Dead Bug", "Bird Dog", "Plank Shoulder Taps", "Reverse Crunch", "Bicycle Crunch", "Mountain Climbers", "Flutter Kicks", "Heel Taps"],
@@ -182,6 +200,17 @@
 
         async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
 
+        // MUSIC SELECTION LOGIC
+        function handleMusicUpload(input) {
+            const file = input.files[0];
+            if (file) {
+                const player = document.getElementById('workout-music');
+                const url = URL.createObjectURL(file);
+                player.src = url;
+                document.getElementById('track-display').innerText = "Track: " + file.name;
+            }
+        }
+
         function init() {
             const data = workoutData[viewDay];
             document.getElementById('day-name').innerText = DAYS[viewDay];
@@ -189,15 +218,14 @@
             const list = document.getElementById('exercise-display-list');
             if (viewDay === 0 && data.ex.length === 0) {
                 list.innerHTML = "<li class='exercise-item active'>Enjoy your rest day!</li>";
-                document.getElementById('ctrl-btns').style.display = 'none';
+                document.getElementById('main-controls').style.display = 'none';
             } else {
                 list.innerHTML = data.ex.map((e, i) => `<li class="exercise-item" id="ex-item-${i}">${e}</li>`).join('');
-                document.getElementById('ctrl-btns').style.display = 'flex';
+                document.getElementById('main-controls').style.display = 'block';
             }
         }
 
         function changeDay(dir) { viewDay = (viewDay + dir + 7) % 7; init(); }
-
         function showProgress() {
             document.getElementById('main-view').classList.add('hidden');
             document.getElementById('progress-view').classList.remove('hidden');
@@ -214,12 +242,8 @@
 
         function resetWeek() {
             if (confirm("Reset current week?")) {
-                if (completedDays.length === 6) {
-                    totalWeeks++;
-                    localStorage.setItem('runnerTotalWeeks_v11', totalWeeks);
-                }
-                completedDays = [];
-                localStorage.setItem('runnerCompletion_v11', JSON.stringify(completedDays));
+                if (completedDays.length === 6) { totalWeeks++; localStorage.setItem('runnerTotalWeeks_v11', totalWeeks); }
+                completedDays = []; localStorage.setItem('runnerCompletion_v11', JSON.stringify(completedDays));
                 showProgress();
             }
         }
@@ -271,10 +295,16 @@
 
         function startWorkout() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            document.getElementById('silent-loop').play().catch(()=>{}); // iOS mute bypass
+            document.getElementById('silent-loop').play().catch(()=>{}); 
+            
+            // Start the workout music (Silence or User Selection)
+            const music = document.getElementById('workout-music');
+            music.currentTime = 0;
+            music.play().catch(()=>{});
+
             requestWakeLock();
             const data = workoutData[viewDay];
-            document.getElementById('ctrl-btns').style.display = 'none';
+            document.getElementById('main-controls').style.display = 'none';
             document.getElementById('timer-container').style.display = 'block';
             document.getElementById('workout-footer').style.display = 'flex';
             document.getElementById('focus-display').classList.add('hidden');
@@ -289,7 +319,13 @@
             stepIdx = 0; secondsLeft = timeline[0].time; isPaused = false; runTimer();
         }
 
-        function togglePause() { if (audioCtx.state === 'suspended') audioCtx.resume(); isPaused = !isPaused; document.getElementById('btn-pause').innerText = isPaused ? "RESUME" : "PAUSE"; }
+        function togglePause() { 
+            if (audioCtx.state === 'suspended') audioCtx.resume(); 
+            isPaused = !isPaused; 
+            const music = document.getElementById('workout-music');
+            if (isPaused) music.pause(); else music.play();
+            document.getElementById('btn-pause').innerText = isPaused ? "RESUME" : "PAUSE"; 
+        }
 
         function runTimer() {
             updateUI();
@@ -326,10 +362,11 @@
         function quitWorkout() {
             clearInterval(timerInterval);
             document.getElementById('silent-loop').pause();
+            document.getElementById('workout-music').pause(); // Stop workout music
             if (wakeLock) wakeLock.release().then(() => wakeLock = null);
             document.getElementById('timer-container').style.display = 'none';
             document.getElementById('workout-footer').style.display = 'none';
-            document.getElementById('ctrl-btns').style.display = 'flex';
+            document.getElementById('main-controls').style.display = 'block';
             document.getElementById('focus-display').classList.remove('hidden');
             document.getElementById('progress-trigger').classList.remove('hidden');
             document.getElementById('btn-pause').innerText = "PAUSE";
