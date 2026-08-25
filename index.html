@@ -22,7 +22,7 @@
         .nav-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--primary); padding: 5px 15px; font-weight: bold; }
         .progress-link { color: var(--info); font-size: 0.85rem; font-weight: bold; text-decoration: underline; cursor: pointer; display: inline-block; margin-top: 5px; }
 
-        .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box; text-align: center; }
+        .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box; text-align: center; margin-bottom: 20px; }
         .focus-box { font-style: italic; color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.4; border-left: 3px solid var(--accent); padding-left: 10px; text-align: left; }
         
         .exercise-list { list-style: none; padding: 0; margin: 20px 0; display: flex; flex-direction: column; align-items: center; }
@@ -53,7 +53,7 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; width: 90%; max-width: 400px; max-height: 80vh; border-radius: 20px; padding: 25px; overflow-y: auto; position: relative; }
         
-        /* Music Switch Styles */
+        /* Music Mode Switch UI */
         .music-toggle-box { margin-top: 15px; padding: 12px; background: #f0f3f5; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; }
         .music-toggle-box label { font-size: 0.8rem; font-weight: bold; color: var(--text); margin: 0; text-align: left; line-height: 1.2; text-transform: none;}
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
@@ -63,7 +63,7 @@
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* Tailor Increments */
+        /* Step Buttons for Tailor */
         .step-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px; }
         .step-btn { background: #ecf0f1; color: var(--text); width: 45px; height: 45px; border-radius: 10px; border: 1px solid #ddd; font-size: 1.4rem; cursor: pointer; }
         .step-display { width: 80px; font-weight: bold; font-size: 1.2rem; }
@@ -77,7 +77,7 @@
 </head>
 <body>
 
-    <!-- SILENCE AUDIO -->
+    <!-- SILENCE PLAYER FOR BEEPS OVER MUSIC -->
     <audio id="silent-loop" loop preload="auto">
         <source src="Silence.mp3" type="audio/mpeg">
     </audio>
@@ -99,11 +99,13 @@
                 <div id="timer-display">10</div>
             </div>
             <ul class="exercise-list" id="exercise-display-list"></ul>
+            
             <div id="main-controls">
                 <div class="btn-group" id="ctrl-btns">
                     <button onclick="startWorkout()">START</button>
                     <button style="background:#3498db" onclick="showEditor()">TAILOR</button>
                 </div>
+                <!-- Music Mode Toggle -->
                 <div class="music-toggle-box">
                     <label for="music-mode">Background Music Mode?<br><small>ON: For Spotify / Apple Music</small></label>
                     <label class="switch">
@@ -112,6 +114,7 @@
                     </label>
                 </div>
             </div>
+
             <div class="workout-footer" id="workout-footer">
                 <div class="set-indicator" id="set-display">SET 1/3</div>
                 <button id="btn-pause" class="pause-btn" onclick="togglePause()">PAUSE</button>
@@ -120,6 +123,7 @@
         </div>
     </div>
 
+    <!-- Progress View Card Restored -->
     <div class="container hidden" id="progress-view">
         <div class="card">
             <h1 style="text-align: center; color: var(--primary); margin-bottom: 5px;">10Daily Weekly Progress</h1>
@@ -138,6 +142,7 @@
         </div>
     </div>
 
+    <!-- Editor View Card Restored -->
     <div class="container hidden" id="editor-view">
         <div class="card">
             <button style="background:#3498db; margin-bottom:20px; width:100%" onclick="hideEditor()">&#10094; Back</button>
@@ -167,6 +172,7 @@
         </div>
     </div>
 
+    <!-- Instructions Modal Restored -->
     <div class="modal-overlay" id="modal-overlay" onclick="closeInstructions()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div style="text-align: right;"><button onclick="closeInstructions()" style="background: none; color: var(--muted); padding: 0; font-size: 1.5rem; border: none; cursor: pointer;">&times;</button></div>
@@ -187,6 +193,7 @@
     </div>
 
     <script>
+        // FULL ORIGINAL POOL RESTORED
         let EXERCISE_POOL = JSON.parse(localStorage.getItem('runnerPool')) || {
             "Legs": ["Squats", "Reverse Lunges", "Forward Lunges", "Split Squats", "Side Lunges", "Single-leg Romanian Deadlift", "Sprinter Bridges", "Single-leg Calf Raises", "Tibialis Raises"],
             "Core": ["Front Plank", "Side Plank", "Dead Bug", "Bird Dog", "Plank Shoulder Taps", "Reverse Crunch", "Bicycle Crunch", "Mountain Climbers", "Flutter Kicks", "Heel Taps"],
@@ -196,6 +203,7 @@
         };
 
         const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        // PRESERVING v11 STORAGE KEYS
         let workoutData = JSON.parse(localStorage.getItem('runnerWorkouts_v11')) || {
             1: { focus: "Strength, power and Achilles resilience.", work: 30, rest: 10, ex: ["Squats", "Reverse Lunges", "Single-leg Romanian Deadlift", "Sprinter Bridges", "Single-leg Calf Raises"] },
             2: { focus: "Arm drive, posture and upper-body endurance.", work: 30, rest: 10, ex: ["Press-ups", "Diamond Press-ups", "Triceps Dips", "High Plank Shoulder Taps", "Arm Circles"] },
@@ -326,9 +334,12 @@
 
         async function startWorkout() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            // Silence mixing logic
             if (!document.getElementById('music-mode').checked) {
                 document.getElementById('silent-loop').play().catch(()=>{}); 
             }
+            
             requestWakeLock();
             const data = workoutData[viewDay];
             document.getElementById('ctrl-btns').style.display = 'none';
@@ -346,7 +357,10 @@
             stepIdx = 0; secondsLeft = timeline[0].time; isPaused = false; runTimer();
         }
 
-        function togglePause() { isPaused = !isPaused; document.getElementById('btn-pause').innerText = isPaused ? "RESUME" : "PAUSE"; }
+        function togglePause() { 
+            isPaused = !isPaused; 
+            document.getElementById('btn-pause').innerText = isPaused ? "RESUME" : "PAUSE"; 
+        }
 
         function runTimer() {
             updateUI();
