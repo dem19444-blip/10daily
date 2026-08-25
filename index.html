@@ -4,74 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>10Daily</title>
-    <!-- Favicon / Home Screen Icon -->
+    <!-- Icons -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232ecc71%22/><text y=%22.9em%22 x=%2250%%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>10</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232ecc71%22/><text y=%22.9em%22 x=%2250%%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>10</text></svg>">
     
     <style>
         :root { --primary: #2ecc71; --bg: #f4f7f6; --text: #2c3e50; --muted: #95a5a6; --accent: #e67e22; --info: #2980b9; }
-        
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 400px; box-sizing: border-box; }
-        
-        /* Navigation Area */
         .header-container { text-align: center; margin-bottom: 15px; }
         .day-nav { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .nav-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--primary); padding: 5px 15px; font-weight: bold; }
         .progress-link { color: var(--info); font-size: 0.85rem; font-weight: bold; text-decoration: underline; cursor: pointer; display: inline-block; margin-top: 5px; }
-
         .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box; text-align: center; }
         .focus-box { font-style: italic; color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.4; border-left: 3px solid var(--accent); padding-left: 10px; text-align: left; }
-        
         .exercise-list { list-style: none; padding: 0; margin: 20px 0; display: flex; flex-direction: column; align-items: center; }
         .exercise-item { width: 100%; padding: 12px 15px; margin: 8px 0; border-radius: 10px; background: #f8f9fa; color: var(--muted); font-weight: 600; box-sizing: border-box; transition: 0.3s; font-size: 1rem; }
         .exercise-item.active { background: #eafff0; color: var(--primary); transform: scale(1.05); border: 1px solid var(--primary); }
-        
         #timer-container { display: none; margin-bottom: 20px; }
         #timer-display { font-size: 5.5rem; font-weight: 800; margin: -10px 0; line-height: 1; }
         #status-label { font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
-        
         .btn-group { display: flex; gap: 10px; width: 100%; }
         button { flex: 1; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
-        
-        /* Audio Widget Styles */
-        .audio-widget { margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .audio-label { font-size: 0.75rem; color: var(--muted); font-weight: bold; text-transform: uppercase; }
-        .track-name { font-size: 0.85rem; color: var(--info); font-weight: 600; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .audio-btn { background: #edf2f7; color: var(--text); padding: 8px 15px; font-size: 0.8rem; border-radius: 8px; flex: none; width: auto; }
-
         .workout-footer { display: none; justify-content: space-between; align-items: center; width: 100%; margin-top: 20px; }
         .set-indicator { font-weight: bold; color: var(--muted); font-size: 1.1rem; flex: 1; text-align: left; }
         .pause-btn { background: #3498db; flex: 1.5; margin-right: 10px; }
         .stop-btn { background: #e74c3c; flex: 1; }
-        
-        /* Weekly Progress Styling */
-        .progress-instruction { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 10px; line-height: 1.4; font-style: italic; }
-        .streak-counter { font-weight: bold; color: var(--text); font-size: 1rem; margin-bottom: 20px; display: block; }
-        .progress-list { list-style: none; padding: 0; margin: 15px 0; width: 100%; }
-        .progress-day-row { background: #edf2f7; margin-bottom: 10px; padding: 15px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; cursor: pointer; }
-        .progress-day-row.is-done { background: #eafff0; border-left: 5px solid var(--primary); }
-        .tick { color: var(--primary); font-size: 1.3rem; font-weight: bold; }
-        
-        /* Modal Instructions */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; width: 90%; max-width: 400px; max-height: 80vh; border-radius: 20px; padding: 25px; overflow-y: auto; position: relative; }
-        
+        .audio-widget { margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .track-name { font-size: 0.85rem; color: var(--info); font-weight: 600; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .audio-btn { background: #edf2f7; color: var(--text); padding: 8px 15px; font-size: 0.8rem; border-radius: 8px; flex: none; }
+
+        /* Incrementor Styles */
+        .step-input-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px; }
+        .step-btn { background: #ecf0f1; color: var(--text); padding: 10px; border-radius: 8px; flex: none; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .step-input-container input { margin-bottom: 0; width: 80px; }
+
         .hidden { display: none !important; }
         .setup-row { margin-bottom: 15px; text-align: center; }
         label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; color: var(--muted); text-transform: uppercase; }
-        select, input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; font-size: 1rem; text-align: center; -webkit-appearance: none; }
-        .custom-input { margin-top: 5px; border-color: var(--accent); display: none; }
+        select, input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; font-size: 1rem; text-align: center; }
+
+        .progress-list { list-style: none; padding: 0; margin: 15px 0; width: 100%; }
+        .progress-day-row { background: #edf2f7; margin-bottom: 10px; padding: 15px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; cursor: pointer; }
+        .progress-day-row.is-done { background: #eafff0; border-left: 5px solid var(--primary); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; width: 90%; max-width: 400px; max-height: 80vh; border-radius: 20px; padding: 25px; overflow-y: auto; }
     </style>
 </head>
 <body>
 
-    <!-- SILENT AUDIO FOR BYPASSING MUTE SWITCH -->
     <audio id="silent-loop" loop preload="auto">
         <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
     </audio>
-
-    <!-- WORKOUT MUSIC PLAYER -->
     <audio id="workout-music" src="Silence.mp3" preload="auto"></audio>
 
     <div class="container" id="main-view">
@@ -91,22 +75,17 @@
                 <div id="timer-display">10</div>
             </div>
             <ul class="exercise-list" id="exercise-display-list"></ul>
-            
             <div id="main-controls">
                 <div class="btn-group" id="ctrl-btns">
                     <button onclick="startWorkout()">START</button>
                     <button style="background:#3498db" onclick="showEditor()">TAILOR</button>
                 </div>
-
-                <!-- Music Selector Widget -->
-                <div class="audio-widget" id="audio-widget">
-                    <span class="audio-label">Workout Music</span>
+                <div class="audio-widget">
                     <span id="track-display" class="track-name">Default: Silence.mp3</span>
                     <input type="file" id="music-upload" accept="audio/*" style="display:none" onchange="handleMusicUpload(this)">
-                    <button class="audio-btn" onclick="document.getElementById('music-upload').click()">Choose from Phone...</button>
+                    <button class="audio-btn" onclick="document.getElementById('music-upload').click()">Choose Music File...</button>
                 </div>
             </div>
-
             <div class="workout-footer" id="workout-footer">
                 <div class="set-indicator" id="set-display">SET 1/3</div>
                 <button id="btn-pause" class="pause-btn" onclick="togglePause()">PAUSE</button>
@@ -115,17 +94,9 @@
         </div>
     </div>
 
-    <!-- Rest of the views (Progress/Editor/Modal) remain identical -->
     <div class="container hidden" id="progress-view">
-        <h1 style="text-align: center; color: var(--primary); margin-bottom: 5px;">10Daily Weekly Progress</h1>
-        <div style="text-align: center;">
-            <p class="progress-instruction">Sessions are automatically ticked off once you reach the 'Done!' screen.</p>
-            <span class="streak-counter">Total Weeks Completed: <span id="total-weeks-display">0</span></span>
-        </div>
+        <h1 style="text-align: center; color: var(--primary);">Weekly Progress</h1>
         <div class="progress-list" id="progress-list-content"></div>
-        <div style="text-align: center; margin: 15px 0;">
-            <span style="color: var(--info); font-weight: bold; text-decoration: underline; cursor: pointer;" onclick="openInstructions()">App Instructions</span>
-        </div>
         <div class="btn-group">
             <button style="background: var(--muted);" onclick="goBackToWorkout()">Back</button>
             <button style="background: var(--accent);" onclick="resetWeek()">Reset Week</button>
@@ -135,58 +106,66 @@
     <div class="container hidden" id="editor-view">
         <div class="card">
             <button style="background:#3498db; margin-bottom:20px; width:100%" onclick="hideEditor()">&#10094; Back</button>
-            <h3 id="edit-header" style="margin-top:0">Tailor Monday</h3>
+            <h3 id="edit-header">Tailor</h3>
             <div class="setup-row"><label>Daily Focus</label><textarea id="edit-focus" rows="2"></textarea></div>
-            <div class="setup-row"><label>Work (s)</label><input type="number" id="edit-work" step="5"></div>
-            <div class="setup-row"><label>Rest (s)</label><input type="number" id="edit-rest" step="5"></div>
+            
+            <div class="setup-row">
+                <label>Work (s)</label>
+                <div class="step-input-container">
+                    <button class="step-btn" onclick="stepInput('edit-work', -5)">-</button>
+                    <input type="number" id="edit-work" readonly>
+                    <button class="step-btn" onclick="stepInput('edit-work', 5)">+</button>
+                </div>
+            </div>
+
+            <div class="setup-row">
+                <label>Rest (s)</label>
+                <div class="step-input-container">
+                    <button class="step-btn" onclick="stepInput('edit-rest', -5)">-</button>
+                    <input type="number" id="edit-rest" readonly>
+                    <button class="step-btn" onclick="stepInput('edit-rest', 5)">+</button>
+                </div>
+            </div>
+
             <div id="exercise-inputs"></div>
-            <button onclick="saveRoutine()" style="width:100%; margin-top:10px; margin-bottom: 20px;">SAVE CHANGES</button>
+            <button onclick="saveRoutine()" style="width:100%; margin-top:10px;">SAVE CHANGES</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="modal-overlay" onclick="closeInstructions()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div style="text-align: right;"><button onclick="closeInstructions()" style="background: none; color: var(--muted); padding: 0; font-size: 1.5rem; border: none; cursor: pointer;">&times;</button></div>
-            <div id="modal-body">
-                <h2 style="color: var(--primary); margin-top: 0;">Welcome to 10Daily</h2>
-                <p><strong>The Philosophy</strong></p>
-                <p>This app is designed for runners to build strength and resilience in just 10 minutes <strong>Daily</strong>.</p>
-                <p><strong>How to Use</strong></p>
-                <p><strong>Music:</strong> Use the selector below 'Start' to choose a track from your phone. If none is chosen, it plays 'Silence.mp3' to ensure the app stays awake and beeps correctly.</p>
-                <p><strong>Installation:</strong> Share > 'Add to Home Screen' for full-screen mode.</p>
-            </div>
-            <button onclick="closeInstructions()" style="width: 100%; margin-top: 15px;">Got it</button>
+            <h2>Tips & Instructions</h2>
+            <p><strong>Music:</strong> Browser apps cannot access your Apple Music Library directly. Either choose a downloaded MP3 file from your "Files" app, or simply play Apple Music/Spotify in the background—this app will beep over the top.</p>
+            <button onclick="closeInstructions()" style="width: 100%;">Got it</button>
         </div>
     </div>
 
     <script>
-        // Data and Initial Variables preserved
+        const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         let EXERCISE_POOL = JSON.parse(localStorage.getItem('runnerPool')) || {
             "Legs": ["Squats", "Reverse Lunges", "Forward Lunges", "Split Squats", "Side Lunges", "Single-leg Romanian Deadlift", "Sprinter Bridges", "Single-leg Calf Raises", "Tibialis Raises"],
             "Core": ["Front Plank", "Side Plank", "Dead Bug", "Bird Dog", "Plank Shoulder Taps", "Reverse Crunch", "Bicycle Crunch", "Mountain Climbers", "Flutter Kicks", "Heel Taps"],
             "Upper Body": ["Press-ups", "Diamond Press-ups", "Triceps Dips", "Arm Circles", "High Plank Shoulder Taps"],
-            "Hip Stability & Balance": ["Clamshells", "Fire Hydrants", "Donkey Kicks", "Single-leg Glute Bridges", "Side-lying Leg Raise", "Single-leg Balance with Knee Drive"],
+            "Hip Stability": ["Clamshells", "Fire Hydrants", "Donkey Kicks", "Single-leg Glute Bridges", "Side-lying Leg Raise", "Single-leg Balance"],
             "Custom": []
         };
 
-        const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         let workoutData = JSON.parse(localStorage.getItem('runnerWorkouts_v11')) || {
-            1: { focus: "Strength, power and Achilles resilience.", work: 30, rest: 10, ex: ["Squats", "Reverse Lunges", "Single-leg Romanian Deadlift", "Sprinter Bridges", "Single-leg Calf Raises"] },
-            2: { focus: "Arm drive, posture and upper-body endurance.", work: 30, rest: 10, ex: ["Press-ups", "Diamond Press-ups", "Triceps Dips", "High Plank Shoulder Taps", "Arm Circles"] },
-            3: { focus: "Core stability for maintaining form.", work: 30, rest: 10, ex: ["Front Plank", "Side Plank", "Side Plank", "Dead Bug", "Bird Dog"] },
-            4: { focus: "Balance, coordination and injury prevention.", work: 30, rest: 10, ex: ["Split Squats", "Single-leg Balance with Knee Drive", "Side Lunges", "Plank Shoulder Taps", "Single-leg Glute Bridges"] },
+            1: { focus: "Strength and Achilles resilience.", work: 30, rest: 10, ex: ["Squats", "Reverse Lunges", "Single-leg Romanian Deadlift", "Sprinter Bridges", "Single-leg Calf Raises"] },
+            2: { focus: "Arm drive and posture.", work: 30, rest: 10, ex: ["Press-ups", "Diamond Press-ups", "Triceps Dips", "High Plank Shoulder Taps", "Arm Circles"] },
+            3: { focus: "Core stability.", work: 30, rest: 10, ex: ["Front Plank", "Side Plank", "Side Plank", "Dead Bug", "Bird Dog"] },
+            4: { focus: "Balance and coordination.", work: 30, rest: 10, ex: ["Split Squats", "Single-leg Balance", "Side Lunges", "Plank Shoulder Taps", "Single-leg Glute Bridges"] },
             5: { focus: "Hip stability and glute activation.", work: 30, rest: 10, ex: ["Clamshells", "Fire Hydrants", "Donkey Kicks", "Side-lying Leg Raise", "Single-leg Glute Bridges"] },
-            6: { focus: "Athletic movement and conditioning.", work: 30, rest: 10, ex: ["Mountain Climbers", "Reverse Crunch", "Flutter Kicks", "Bicycle Crunch", "Tibialis Raises"] },
+            6: { focus: "Athletic movement.", work: 30, rest: 10, ex: ["Mountain Climbers", "Reverse Crunch", "Flutter Kicks", "Bicycle Crunch", "Tibialis Raises"] },
             0: { focus: "Rest and recover.", work: 0, rest: 0, ex: [] }
         };
 
         let completedDays = JSON.parse(localStorage.getItem('runnerCompletion_v11')) || [];
         let totalWeeks = parseInt(localStorage.getItem('runnerTotalWeeks_v11')) || 0;
-        
         let viewDay = new Date().getDay(); 
         let timerInterval, isPaused = false, timeline = [], stepIdx = 0, secondsLeft = 0, wakeLock = null;
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
+
         function beep(freq, duration, vol) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
@@ -198,15 +177,26 @@
             osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
-        async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
+        // 9 Quick beeps + 1 Long beep
+        async function victorySequence() {
+            for(let i=0; i<9; i++) {
+                beep(1200, 0.1, 0.6);
+                await new Promise(r => setTimeout(r, 150));
+            }
+            beep(1200, 0.8, 0.8);
+        }
 
-        // MUSIC SELECTION LOGIC
+        function stepInput(id, val) {
+            let el = document.getElementById(id);
+            let cur = parseInt(el.value) || 0;
+            let newVal = Math.max(0, cur + val);
+            el.value = newVal;
+        }
+
         function handleMusicUpload(input) {
             const file = input.files[0];
             if (file) {
-                const player = document.getElementById('workout-music');
-                const url = URL.createObjectURL(file);
-                player.src = url;
+                document.getElementById('workout-music').src = URL.createObjectURL(file);
                 document.getElementById('track-display').innerText = "Track: " + file.name;
             }
         }
@@ -229,86 +219,63 @@
         function showProgress() {
             document.getElementById('main-view').classList.add('hidden');
             document.getElementById('progress-view').classList.remove('hidden');
-            document.getElementById('total-weeks-display').innerText = totalWeeks;
             const list = document.getElementById('progress-list-content');
             list.innerHTML = "";
             for (let i = 1; i <= 6; i++) {
                 const done = completedDays.includes(i);
-                list.innerHTML += `<div class="progress-day-row ${done ? 'is-done' : ''}" onclick="jumpToDay(${i})">
-                    ${DAYS[i]} <span class="tick">${done ? '&#10003;' : ''}</span>
-                </div>`;
-            }
-        }
-
-        function resetWeek() {
-            if (confirm("Reset current week?")) {
-                if (completedDays.length === 6) { totalWeeks++; localStorage.setItem('runnerTotalWeeks_v11', totalWeeks); }
-                completedDays = []; localStorage.setItem('runnerCompletion_v11', JSON.stringify(completedDays));
-                showProgress();
+                list.innerHTML += `<div class="progress-day-row ${done ? 'is-done' : ''}" onclick="jumpToDay(${i})">${DAYS[i]} <span>${done ? '&#10003;' : ''}</span></div>`;
             }
         }
 
         function jumpToDay(day) { viewDay = day; goBackToWorkout(); }
         function goBackToWorkout() { document.getElementById('progress-view').classList.add('hidden'); document.getElementById('main-view').classList.remove('hidden'); init(); }
-        function openInstructions() { document.getElementById('modal-overlay').style.display = 'flex'; }
-        function closeInstructions() { document.getElementById('modal-overlay').style.display = 'none'; }
 
         function showEditor() {
             document.getElementById('main-view').classList.add('hidden');
             document.getElementById('editor-view').classList.remove('hidden');
             const data = workoutData[viewDay];
+            document.getElementById('edit-header').innerText = "Tailor " + DAYS[viewDay];
             document.getElementById('edit-focus').value = data.focus;
             document.getElementById('edit-work').value = data.work;
             document.getElementById('edit-rest').value = data.rest;
             let html = "";
             for(let i=0; i<5; i++) {
-                html += `<div class="setup-row"><label>Exercise ${i+1}</label><select id="input-ex-${i}" onchange="checkCustom(this, ${i})">`;
+                html += `<div class="setup-row"><label>Ex ${i+1}</label><select id="input-ex-${i}">`;
                 Object.entries(EXERCISE_POOL).forEach(([cat, list]) => {
                     html += `<optgroup label="${cat}">`;
                     list.forEach(ex => html += `<option value="${ex}" ${data.ex[i]===ex?'selected':''}>${ex}</option>`);
                     html += `</optgroup>`;
                 });
-                html += `<option value="ADD_NEW">+ ADD NEW...</option></select><input type="text" id="custom-ex-${i}" class="custom-input" placeholder="Name..."></div>`;
+                html += `</select></div>`;
             }
             document.getElementById('exercise-inputs').innerHTML = html;
         }
 
-        function checkCustom(sel, idx) { document.getElementById(`custom-ex-${idx}`).style.display = (sel.value === 'ADD_NEW') ? 'block' : 'none'; }
         function saveRoutine() {
             const data = workoutData[viewDay];
             data.focus = document.getElementById('edit-focus').value;
-            data.work = parseInt(document.getElementById('edit-work').value) || 30;
-            data.rest = parseInt(document.getElementById('edit-rest').value) || 10;
-            for(let i=0; i<5; i++) {
-                let val = document.getElementById(`input-ex-${i}`).value;
-                if(val === 'ADD_NEW') {
-                    let customVal = document.getElementById(`custom-ex-${i}`).value.trim();
-                    if(customVal) { EXERCISE_POOL.Custom.push(customVal); val = customVal; }
-                }
-                data.ex[i] = val;
-            }
+            data.work = parseInt(document.getElementById('edit-work').value);
+            data.rest = parseInt(document.getElementById('edit-rest').value);
+            for(let i=0; i<5; i++) data.ex[i] = document.getElementById(`input-ex-${i}`).value;
             localStorage.setItem('runnerWorkouts_v11', JSON.stringify(workoutData));
-            localStorage.setItem('runnerPool', JSON.stringify(EXERCISE_POOL));
             hideEditor(); init();
         }
         function hideEditor() { document.getElementById('main-view').classList.remove('hidden'); document.getElementById('editor-view').classList.add('hidden'); }
 
-        function startWorkout() {
+        async function startWorkout() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             document.getElementById('silent-loop').play().catch(()=>{}); 
-            
-            // Start the workout music (Silence or User Selection)
-            const music = document.getElementById('workout-music');
-            music.currentTime = 0;
-            music.play().catch(()=>{});
+            document.getElementById('workout-music').currentTime = 0;
+            document.getElementById('workout-music').play().catch(()=>{});
+            if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen');
 
-            requestWakeLock();
             const data = workoutData[viewDay];
             document.getElementById('main-controls').style.display = 'none';
             document.getElementById('timer-container').style.display = 'block';
             document.getElementById('workout-footer').style.display = 'flex';
             document.getElementById('focus-display').classList.add('hidden');
             document.getElementById('progress-trigger').classList.add('hidden');
+
             timeline = [{ type: 'GET READY', time: 10, hIdx: 0, round: 1 }];
             for(let r=1; r<=3; r++) {
                 data.ex.forEach((name, i) => {
@@ -319,31 +286,27 @@
             stepIdx = 0; secondsLeft = timeline[0].time; isPaused = false; runTimer();
         }
 
-        function togglePause() { 
-            if (audioCtx.state === 'suspended') audioCtx.resume(); 
-            isPaused = !isPaused; 
-            const music = document.getElementById('workout-music');
-            if (isPaused) music.pause(); else music.play();
-            document.getElementById('btn-pause').innerText = isPaused ? "RESUME" : "PAUSE"; 
-        }
-
         function runTimer() {
             updateUI();
-            timerInterval = setInterval(() => {
+            timerInterval = setInterval(async () => {
                 if (isPaused) return;
                 secondsLeft--;
                 if (secondsLeft <= 3 && secondsLeft > 0) beep(600, 0.15, 0.5);
-                if (secondsLeft === 0) beep(1200, 0.6, 0.7);
                 if (secondsLeft < 0) {
                     stepIdx++;
                     if (stepIdx >= timeline.length) { 
                         clearInterval(timerInterval); 
+                        await victorySequence();
                         if (viewDay !== 0 && !completedDays.includes(viewDay)) {
                             completedDays.push(viewDay);
                             localStorage.setItem('runnerCompletion_v11', JSON.stringify(completedDays));
                         }
-                        alert("Done!"); quitWorkout(); return; 
+                        alert("Session Complete!"); 
+                        quitWorkout();
+                        showProgress();
+                        return; 
                     }
+                    beep(1200, 0.6, 0.7);
                     secondsLeft = timeline[stepIdx].time;
                 }
                 updateUI();
@@ -359,19 +322,27 @@
             document.querySelectorAll('.exercise-item').forEach((el, idx) => el.classList.toggle('active', idx === step.hIdx));
         }
 
+        function togglePause() { 
+            isPaused = !isPaused; 
+            const music = document.getElementById('workout-music');
+            if (isPaused) music.pause(); else music.play();
+            document.getElementById('btn-pause').innerText = isPaused ? "RESUME" : "PAUSE"; 
+        }
+
         function quitWorkout() {
             clearInterval(timerInterval);
-            document.getElementById('silent-loop').pause();
-            document.getElementById('workout-music').pause(); // Stop workout music
-            if (wakeLock) wakeLock.release().then(() => wakeLock = null);
+            document.getElementById('workout-music').pause();
+            if (wakeLock) { wakeLock.release(); wakeLock = null; }
             document.getElementById('timer-container').style.display = 'none';
             document.getElementById('workout-footer').style.display = 'none';
             document.getElementById('main-controls').style.display = 'block';
             document.getElementById('focus-display').classList.remove('hidden');
             document.getElementById('progress-trigger').classList.remove('hidden');
-            document.getElementById('btn-pause').innerText = "PAUSE";
             init();
         }
+
+        function closeInstructions() { document.getElementById('modal-overlay').style.display = 'none'; }
+        function resetWeek() { if(confirm("Reset Week?")) { completedDays = []; localStorage.setItem('runnerCompletion_v11', "[]"); showProgress(); } }
 
         init();
     </script>
