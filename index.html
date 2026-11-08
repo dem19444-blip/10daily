@@ -251,10 +251,8 @@
 
         function init() {
         // TEMPORARY RECOVERY: Put your actual numbers here
-        if (!localStorage.getItem('runnerTotalWeeks_v11')) {
-                localStorage.setItem('runnerTotalWeeks_v11', '8'); // <--- Change '3' to your actual total completed weeks!
-                // localStorage.setItem('runnerCompletion_v11', JSON.stringify([1, 2, 3])); // <--- Change to the day numbers you finished this week!
-            }
+       localStorage.setItem('runnerTotalWeeks_v11', '3'); // <--- Change '3' to your actual total completed weeks!
+   // localStorage.setItem('runnerCompletion_v11', JSON.stringify([1, 2, 3])); // <--- Change to the days you finished this week!
          
             const data = workoutData[viewDay];
             document.getElementById('day-name').innerText = DAYS[viewDay];
