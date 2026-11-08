@@ -435,7 +435,19 @@ function runTimer() {
             document.getElementById('btn-pause').innerText = "PAUSE";
             init();
         }
-
+        
+        // Re-engage audio and wake lock when returning to the app
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible') {
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    await audioCtx.resume();
+                }
+                if (wakeLock === null && document.getElementById('timer-container').style.display === 'block' && !isPaused) {
+                    await requestWakeLock();
+                }
+            }
+        });
+        
         init();
     </script>
 </body>
