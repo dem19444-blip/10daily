@@ -348,7 +348,7 @@
             document.getElementById('ctrl-btns').style.display = 'none';
             document.getElementById('timer-container').style.display = 'block';
             document.getElementById('workout-footer').style.display = 'flex';
-            document.getElementById('focus-display').classList.add('hidden');
+            // document.getElementById('focus-display').classList.add('hidden');
             document.getElementById('progress-trigger').classList.add('hidden');
             timeline = [{ type: 'GET READY', time: 10, hIdx: 0, round: 1 }];
             for(let r=1; r<=3; r++) {
@@ -430,7 +430,7 @@ function runTimer() {
             document.getElementById('timer-container').style.display = 'none';
             document.getElementById('workout-footer').style.display = 'none';
             document.getElementById('ctrl-btns').style.display = 'flex';
-            document.getElementById('focus-display').classList.remove('hidden');
+            // document.getElementById('focus-display').classList.remove('hidden');
             document.getElementById('progress-trigger').classList.remove('hidden');
             document.getElementById('btn-pause').innerText = "PAUSE";
             init();
