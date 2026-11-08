@@ -250,6 +250,12 @@
         async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
 
         function init() {
+            // ONE-TIME STREAK RECOVERY: Put your actual completed week number here
+            if (!localStorage.getItem('runnerTotalWeeks_v11')) {
+                localStorage.setItem('runnerTotalWeeks_v11', '8'); // Change '3' to whatever week you were on!
+            }
+            let totalWeeks = parseInt(localStorage.getItem('runnerTotalWeeks_v11')) || 0;
+            
             const data = workoutData[viewDay];
             document.getElementById('day-name').innerText = DAYS[viewDay];
             document.getElementById('focus-display').innerText = "Focus: " + data.focus;
