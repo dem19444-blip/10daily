@@ -252,6 +252,7 @@
         function init() {      
             // Temporarily Restore streak
             localStorage.setItem('runnerTotalWeeks_v11', '8');
+            totalWeeks = 8;
             
             const data = workoutData[viewDay];
             document.getElementById('day-name').innerText = DAYS[viewDay];
