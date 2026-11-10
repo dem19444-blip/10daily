@@ -217,7 +217,8 @@
 
         let completedDays = JSON.parse(localStorage.getItem('runnerCompletion_v11')) || [];
         let totalWeeks = parseInt(localStorage.getItem('runnerTotalWeeks_v11')) || 0;
-        let totalWeeks = 8;
+        // tempoorarily set streak
+        // let totalWeeks = 8;
         
         let viewDay = new Date().getDay(); 
         let timerInterval, isPaused = false, timeline = [], stepIdx = 0, secondsLeft = 0, wakeLock = null;
