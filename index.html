@@ -217,6 +217,7 @@
 
         let completedDays = JSON.parse(localStorage.getItem('runnerCompletion_v11')) || [];
         let totalWeeks = parseInt(localStorage.getItem('runnerTotalWeeks_v11')) || 0;
+        totalWeeks = 8;
         
         let viewDay = new Date().getDay(); 
         let timerInterval, isPaused = false, timeline = [], stepIdx = 0, secondsLeft = 0, wakeLock = null;
@@ -249,11 +250,7 @@
 
         async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
 
-        function init() {      
-            // Temporarily Restore streak
-            localStorage.setItem('runnerTotalWeeks_v11', '8');
-            totalWeeks = 8;
-            
+        function init() {                
             const data = workoutData[viewDay];
             document.getElementById('day-name').innerText = DAYS[viewDay];
             document.getElementById('focus-display').innerText = "Focus: " + data.focus;
